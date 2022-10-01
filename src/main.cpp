@@ -1,5 +1,11 @@
 #include "App.h"
 
+extern "C"
+{
+#include "lua.h"
+#include "lualib.h"
+}
+
 /* This is a simple WebSocket echo server example.
  * You may compile it with "WITH_OPENSSL=1 make" or with "make" */
 
