@@ -1,0 +1,6 @@
+.vs/
+x64/
+bin/huo_lua_debugger.exe
+bin/huo_lua_debugger.exp
+bin/huo_lua_debugger.lib
+bin/huo_lua_debugger.pdb
