@@ -107,14 +107,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\include\libuv;.\include\usockets;.\include\uwebsockets;.\include\zlib;.\include\lua;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include\libuv;.\include\usockets;.\include\uwebsockets;.\include\zlib;.\include\lua;.\include\hifunluamanage;.\include\luathirdpartyinclude;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>.\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>uSockets.lib;uv.lib;zlibd.lib;lualib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>uSockets.lib;uv.lib;zlibd.lib;lualib.lib;HifunLuaManage_d.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -134,7 +134,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\luahook.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\network.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\lua\luacommon.h" />
+    <ClInclude Include="src\luahook.h" />
+    <ClInclude Include="src\network.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="natvis\gcobject.natvis" />
+    <Natvis Include="natvis\global_state.natvis" />
+    <Natvis Include="natvis\lua_state.natvis" />
+    <Natvis Include="natvis\node.natvis" />
+    <Natvis Include="natvis\opcode_natvis.natvis" />
+    <Natvis Include="natvis\proto.natvis" />
+    <Natvis Include="natvis\table.natvis" />
+    <Natvis Include="natvis\tstring.natvis" />
+    <Natvis Include="natvis\tvalue.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

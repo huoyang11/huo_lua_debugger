@@ -18,5 +18,33 @@
     <ClCompile Include="src\main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\luahook.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\network.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\luahook.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\network.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\lua\luacommon.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="natvis\gcobject.natvis" />
+    <Natvis Include="natvis\global_state.natvis" />
+    <Natvis Include="natvis\lua_state.natvis" />
+    <Natvis Include="natvis\node.natvis" />
+    <Natvis Include="natvis\opcode_natvis.natvis" />
+    <Natvis Include="natvis\proto.natvis" />
+    <Natvis Include="natvis\table.natvis" />
+    <Natvis Include="natvis\tstring.natvis" />
+    <Natvis Include="natvis\tvalue.natvis" />
   </ItemGroup>
 </Project>
