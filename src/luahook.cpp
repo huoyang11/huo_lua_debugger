@@ -1,9 +1,13 @@
 #include "luahook.h"
 #include "luacommon.h"
+#include "LuaTable.h"
+#include "LuaValue.h"
 #include <iostream>
 #include <assert.h>
 
 #define noLuaClosure(f)		((f) == NULL || (f)->c.tt == LUA_VCCL)
+
+using namespace HiFun;
 
 namespace huo_lua
 {
@@ -307,6 +311,36 @@ namespace huo_lua
             lua_pushliteral(L, "?");
     }
 
+#define ispseudo(i)		((i) <= LUA_REGISTRYINDEX)
+    static TValue* index2value(lua_State* L, int idx) {
+        CallInfo* ci = L->ci;
+        if (idx > 0) {
+            StkId o = ci->func + idx;
+            api_check(L, idx <= L->ci->top - (ci->func + 1), "unacceptable index");
+            if (o >= L->top) return &G(L)->nilvalue;
+            else return s2v(o);
+        }
+        else if (!ispseudo(idx)) {  /* negative index */
+            api_check(L, idx != 0 && -idx <= L->top - (ci->func + 1), "invalid index");
+            return s2v(L->top + idx);
+        }
+        else if (idx == LUA_REGISTRYINDEX)
+            return &G(L)->l_registry;
+        else {  /* upvalues */
+            idx = LUA_REGISTRYINDEX - idx;
+            api_check(L, idx <= MAXUPVAL + 1, "upvalue index too large");
+            if (ttisCclosure(s2v(ci->func))) {  /* C closure? */
+                CClosure* func = clCvalue(s2v(ci->func));
+                return (idx <= func->nupvalues) ? &func->upvalue[idx - 1]
+                    : &G(L)->nilvalue;
+            }
+            else {  /* light C function or Lua function (through a hook)?) */
+                api_check(L, ttislcf(s2v(ci->func)), "caller not a C function");
+                return &G(L)->nilvalue;  /* no upvalues */
+            }
+        }
+    }
+
     static std::string lua_valpointer(lua_State* L, int index, const char* name)
     {
         std::string ret = name;
@@ -324,7 +358,6 @@ namespace huo_lua
 
     static std::string tostring(lua_State* L,int current_stack)
     {
-        int n = lua_gettop(L);
         std::string ret = "";
         std::string val = "";
         char buf[] = "0xffffffffffffffff";
@@ -363,24 +396,20 @@ namespace huo_lua
             }
             case LUA_TSTRING: {
                 const char* str = lua_tostring(L, current_stack);
+                ret += "\"";
                 ret += str;
+                ret += "\"";
                 break;
             }
             case LUA_TTABLE: {
-                lua_getglobal(L, "Lua_cjson");
-                if (lua_isnil(L, -1))
+                LuaTable tab = LuaValue(index2value(L, current_stack));
+                //TODO 
+                LuaValue k,v;
+                while (tab.TableNext(k, v))
                 {
-                    lua_pop(L, 1);
-                    ret += lua_valpointer(L, current_stack, "table");
+
                 }
-                else
-                {
-                    lua_getfield(L, -1, "encode");
-                    lua_pushvalue(L, current_stack - 2);
-                    lua_call(L, 1, 1);
-                    ret += lua_tostring(L, -1);
-                    lua_pop(L, 2);
-                }
+
                 break;
             }
             case LUA_TFUNCTION: {
@@ -401,6 +430,15 @@ namespace huo_lua
             }
         }
 
+        return ret;
+    }
+
+    static std::string tostring(lua_State* L, TValue* val)
+    {
+        setobj2s(L, L->top, val);
+        api_incr_top(L);
+        std::string ret = tostring(L,-1);
+        lua_pop(L,1);
         return ret;
     }
 
@@ -443,9 +481,29 @@ namespace huo_lua
                 lua_pop(L, 1);
                 break;
             }
+
             frame_info.locals.push_back({ name , tostring(L, -1) });
             index++;
             lua_pop(L,1);
+        }
+
+        TValue* fi = s2v(ci->func);
+        if (ttypetag(fi) == LUA_VCCL)
+        {
+            CClosure* f = clCvalue(fi);
+            for (int i = 0; i < f->nupvalues; i++)
+            {
+                frame_info.upvalues.push_back({ std::to_string(i) , tostring(L,&f->upvalue[i])});
+            }
+        }
+        else if (ttypetag(fi) == LUA_VLCL)
+        {
+            LClosure* f = clLvalue(fi);
+            Proto* p = f->p;
+            for (int i = 0; i < p->sizeupvalues; i++)
+            {
+                frame_info.upvalues.push_back({ getstr(p->upvalues[i].name) , tostring(L,f->upvals[i]->v) });
+            }
         }
 
         assert(L->top == oldtop);
@@ -455,6 +513,8 @@ namespace huo_lua
 
     void lua_Hook_call(lua_State* L, lua_Debug* ar)
     {
+        auto oldtop = L->top;
+
         std::vector<lua_frame_info> frames;
         struct lua_frame_info frame_info = {0};
 
@@ -477,6 +537,14 @@ namespace huo_lua
         }
         std::cout << std::endl;
 
-        int a = 20;
+        assert(L->top == oldtop);
+
+        if (Hook_call) Hook_call(frames);
+    }
+
+    std::function<void(const std::vector<lua_frame_info>& frames)> Hook_call;
+    void set_lua_Hook_call(std::function<void(const std::vector<lua_frame_info>& frames)> fun)
+    {
+        Hook_call = fun;
     }
 }

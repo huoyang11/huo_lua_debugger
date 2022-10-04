@@ -1,12 +1,9 @@
-#include "network.h"
+﻿#include "network.h"
 #include "App.h"
+#include "WebSocket.h"
 
 namespace huo_lua
 {
-	struct PerSocketData {
-		/* Fill with user data */
-	};
-
 	network::network(const std::string& url, uint16_t port)
 	{
 		m_app = new uWS::SSLApp({
@@ -27,7 +24,7 @@ namespace huo_lua
 			/* Handlers */
 			.upgrade = nullptr,
 			.open = [this](auto* ws) {
-				if(m_open_function) m_open_function();
+				if(m_open_function) m_open_function(ws);
 			},
 			.message = [this](auto* ws, std::string_view message, uWS::OpCode opCode) {
 				std::cout << message << std::endl;
@@ -63,7 +60,7 @@ namespace huo_lua
 		m_app->run();
 	}
 
-	void network::set_open_function(std::function<void()> fn)
+	void network::set_open_function(std::function<void(uWS::WebSocket<true, true, PerSocketData>*)> fn)
 	{
 		m_open_function = fn;
 	}
@@ -78,7 +75,7 @@ namespace huo_lua
 		m_close_function = fn;
 	}
 
-	void network::set_functions(std::function<void()> open, std::function<std::string(std::string_view message)> message, std::function<void()> close)
+	void network::set_functions(std::function<void(uWS::WebSocket<true, true, PerSocketData>*)> open, std::function<std::string(std::string_view message)> message, std::function<void()> close)
 	{
 		m_open_function = open;
 		m_message_function = message;

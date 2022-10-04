@@ -75,6 +75,8 @@ namespace HiFun
 		uint8_t* Serialize(int32_t& size);
 		Table* Deserialize(uint8_t* buf);
 
+		int TableNext(LuaValue& k, LuaValue& v);
+
 		std::string DumpJsonStr();
 
 		bool IsEmpty();
@@ -108,9 +110,12 @@ namespace HiFun
 		static void GetValue(Table* t,const std::string key, LuaValue& Val);
 		static void GetValue(Table* t,const lua_Integer key, LuaValue& Val);
 		static LuaValue GetTableIndex(Table* t, const std::string name, bool exception = false);
+		static struct Table* GetMetatable(Table* t);
 
 		static uint8_t *Serialize(lua_State* L, Table* t, int32_t&size);
 		static Table* Deserialize(lua_State* L, uint8_t *buf);
+
+		static int TableNext(Table* t, LuaValue &k, LuaValue& v);
 
 		static std::string DumpJsonStr(Table* t);
 		static bool JsonStr2LuaTable(const std::string& str, LuaTable& tab);

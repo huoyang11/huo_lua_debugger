@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>websocket</title>
+        <script type="text/javascript" src="./jquery-3.6.1.min.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function(){
+                var ws = new WebSocket("ws://localhost:9001/");
+            
+                ws.onopen = function(evt) {
+                    console.log("Connection open ...");
+                    ws.send("Hello WebSockets!");
+                };
+                
+                ws.onmessage = function(evt) {
+                    console.log("Received Message: " + evt.data);
+                    //ws.close();
+                };
+                
+                ws.onclose = function(evt) {
+                    console.log("Connection closed.");
+                }
+
+                $("#sendmsgbtn").click(function(){
+                    var msg = $("#ctrl").val();
+                    ws.send(msg);
+                })
+            });
+        </script>
+    </head>
+    <body>
+        <form>
+            <input type="text" id="ctrl"/>
+            <input type="button" value="send" id="sendmsgbtn"/>
+        </form>
+    </body>
+</html>

@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <stdint.h>
+#include <functional>
 
 struct lua_State;
 struct lua_Debug;
@@ -40,7 +41,11 @@ namespace huo_lua
 		std::vector<variable> upvalues;
 	}lua_frame_info;
 
+	extern std::function<void(const std::vector<lua_frame_info>& frames)> Hook_call;
+
 	void lua_Hook_call(lua_State* L, lua_Debug* ar);
+
+	void set_lua_Hook_call(std::function<void(const std::vector<lua_frame_info>& frames)> fun);
 }
 
 #endif

@@ -24,6 +24,12 @@
     <ClCompile Include="src\network.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\lua_debugger.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ctrl\break_point.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\luahook.h">
@@ -33,6 +39,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\lua\luacommon.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lua_debugger.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ctrl\break_point.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

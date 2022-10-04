@@ -134,13 +134,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ctrl\break_point.cpp" />
     <ClCompile Include="src\luahook.cpp" />
+    <ClCompile Include="src\lua_debugger.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\network.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\lua\luacommon.h" />
+    <ClInclude Include="src\ctrl\break_point.h" />
     <ClInclude Include="src\luahook.h" />
+    <ClInclude Include="src\lua_debugger.h" />
     <ClInclude Include="src\network.h" />
   </ItemGroup>
   <ItemGroup>

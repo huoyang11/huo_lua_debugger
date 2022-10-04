@@ -1,14 +1,14 @@
 local a = 999
 
-function aa()
+local function aa()
     print(a)
 end
 
-function bb()
+local function bb()
     aa()
 end
 
-function cc()
+local function cc()
     bb()
 end
 
