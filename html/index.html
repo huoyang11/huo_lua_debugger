@@ -10,7 +10,7 @@
             
                 ws.onopen = function(evt) {
                     console.log("Connection open ...");
-                    ws.send("Hello WebSockets!");
+                    //ws.send("Hello WebSockets!");
                 };
                 
                 ws.onmessage = function(evt) {
@@ -22,9 +22,22 @@
                     console.log("Connection closed.");
                 }
 
+                $("#ctrl").keydown(function (e){
+                    if (e.keyCode == 13){
+                        var msg = $("#ctrl").val();
+                        var data = {};
+                        data["ctrl"] = msg
+                        var str = JSON.stringify(data)
+                        ws.send(str);
+                    }
+                })
+
                 $("#sendmsgbtn").click(function(){
                     var msg = $("#ctrl").val();
-                    ws.send(msg);
+                    var data = {};
+                    data["ctrl"] = msg
+                    var str = JSON.stringify(data)
+                    ws.send(str);
                 })
             });
         </script>

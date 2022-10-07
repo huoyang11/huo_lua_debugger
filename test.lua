@@ -9,7 +9,10 @@ local function bb()
 end
 
 local function cc()
+    local test = 2
     bb()
+    print(test)
 end
 
 cc()
+print(a)

@@ -1,4 +1,4 @@
-#ifndef __LUAHOOK_H__
+﻿#ifndef __LUAHOOK_H__
 #define __LUAHOOK_H__
 
 #include <vector>
@@ -8,6 +8,9 @@
 
 struct lua_State;
 struct lua_Debug;
+
+struct CallInfo;
+union Closure;
 
 namespace huo_lua
 {
@@ -21,7 +24,7 @@ namespace huo_lua
 	{
 		struct 
 		{
-			uint16_t opcode;
+			int16_t opcode;
 			int a;
 			int b;
 			int c;
@@ -34,6 +37,7 @@ namespace huo_lua
 		}code_arg;
 
 		int line;
+		CallInfo* ci;
 		std::string op_name;
 		std::string funname;
 		std::string filepath;
@@ -44,6 +48,8 @@ namespace huo_lua
 	extern std::function<void(const std::vector<lua_frame_info>& frames)> Hook_call;
 
 	void lua_Hook_call(lua_State* L, lua_Debug* ar);
+
+	void funcinfo(lua_Debug* ar, Closure* cl);
 
 	void set_lua_Hook_call(std::function<void(const std::vector<lua_frame_info>& frames)> fun);
 }

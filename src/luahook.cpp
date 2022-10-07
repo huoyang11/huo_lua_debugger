@@ -1,4 +1,4 @@
-#include "luahook.h"
+﻿#include "luahook.h"
 #include "luacommon.h"
 #include "LuaTable.h"
 #include "LuaValue.h"
@@ -13,7 +13,7 @@ namespace huo_lua
 {
     static const char* getobjname(const Proto* p, int lastpc, int reg,
         const char** name);
-    static void funcinfo(lua_Debug* ar, Closure* cl) {
+    void funcinfo(lua_Debug* ar, Closure* cl) {
         if (noLuaClosure(cl)) {
             ar->source = "=[C]";
             ar->srclen = LL("=[C]");
@@ -448,8 +448,9 @@ namespace huo_lua
         struct lua_Debug ar = {0};
         ar.i_ci = ci;
         struct lua_frame_info frame_info = {0};
+        frame_info.ci = ci;
 
-        Instruction i = *(ci->u.l.savedpc);
+        Instruction i = *(ci->u.l.savedpc - 1);
         frame_info.code_arg.opcode = GET_OPCODE(i);
         frame_info.code_arg.a = GETARG_A(i);
         frame_info.code_arg.b = GETARG_B(i);
@@ -461,7 +462,8 @@ namespace huo_lua
         frame_info.code_arg.sbx = GETARG_sBx(i);
         frame_info.code_arg.isk = GETARG_k(i);
 
-        frame_info.op_name = opnames[GET_OPCODE(i)];
+        if (GET_OPCODE(i) < sizeof(opnames)/sizeof(opnames[0]))
+            frame_info.op_name = opnames[GET_OPCODE(i)];
 
         lua_getinfo(L, "Slnt", &ar);
         frame_info.line = ar.currentline;
@@ -520,11 +522,18 @@ namespace huo_lua
 
         CallInfo* ci = ar->i_ci;
 
-        ci->u.l.savedpc--;
-        frames.push_back(get_frame_info(L, ci));
-        ci->u.l.savedpc++;
+        if (!isLfunction(s2v((ci)->func))) return;
 
-        for (CallInfo* it = ci->previous; it != &L->base_ci; it = it->previous)
+        if (ar->event == LUA_HOOKRET)
+        {
+            const Proto* p = ci_func(ci)->p;
+            Instruction* code_end = p->code + p->sizecode;
+            ci->u.l.savedpc = code_end;
+        }
+
+        //frames.push_back(get_frame_info(L, ci));
+
+        for (CallInfo* it = ci; it != &L->base_ci; it = it->previous)
         {
             frames.push_back(get_frame_info(L, it));
         }
@@ -533,7 +542,8 @@ namespace huo_lua
         {
             std::cout << "filepath: " << it.filepath << " "
                 << "funname: " << it.funname << " "
-                << "line: " << it.line << " "<< std::endl;
+                << "line: " << it.line << " "<< " "
+                << "opcode: " << it.op_name << std::endl;
         }
         std::cout << std::endl;
 
